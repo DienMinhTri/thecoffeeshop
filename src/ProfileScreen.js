@@ -13,34 +13,57 @@ const ProfileScreen = () => {
   };
 
   return (
+
+    
     <View style={styles.container}>
 
     
 
     <Text style={styles.label1}>Profile</Text>
       
+    <View style={styles.viewName}>
+      <View style={styles.box1}></View>
       <View >
-      
-        
-      <Text style={styles.label21}>Name </Text>
+      <Text style={styles.label31}>Name </Text>
       <Text style={styles.label2}>ALex </Text>
+      </View>
+      <View style={styles.viewEdit}></View>
+      <View style={styles.box2}></View>
+      </View>
 
-      
+      <View style={styles.viewName}>
+      <View style={styles.box1}></View>
+      <View >
+      <Text style={styles.label31}>Phone number</Text>
+      <Text style={styles.label2}>+375 33 664-57-36 </Text>
+      </View>
+      <View style={styles.viewEdit}></View>
+      <View style={styles.box2}></View>
+      </View>
+
+      <View style={styles.viewName}>
+      <View style={styles.box1}></View>
+      <View >
+      <Text style={styles.label31}>Email  </Text>
+      <Text style={styles.label2}>adosmenesk@pm.me </Text>
+      </View>
+      <View style={styles.viewEdit}></View>
+      <View style={styles.box2}></View>
+      </View>
+
+      <View style={styles.viewName}>
+      <View style={styles.box1}></View>
+      <View >
+      <Text style={styles.label31}> Magic Coffee store address</Text>
+      <Text style={styles.label2}>Bradford BD1 1PR</Text>
+      </View>
+      <View style={styles.viewEdit}></View>
+      <View style={styles.box2}></View>
       </View>
 
       <View>
-      <Text style={styles.label31}>Phone number </Text>
-      <Text style={styles.label3}>+375 33 664-57-36</Text>
-      </View>
-
-      <View>
-      <Text style={styles.label31}>Email </Text>
-      <Text style={styles.label3}>adosmenesk@pm.me </Text>
-      </View>
-
-      <View>
-      <Text style={styles.label41}>Magic Coffee store address </Text>
-      <Text style={styles.label4}>Bradford BD1 1PR</Text>
+      <Text style={styles.label31}> </Text>
+      <Text style={styles.label4}></Text>
       </View>
 
 <View style={styles.container1}>
@@ -56,10 +79,34 @@ const ProfileScreen = () => {
 
 const styles = StyleSheet.create({
   container1: {
-    marginTop: 70,
+    marginTop: 10,
     justifyContent: 'center',
     alignItems: 'center',
     
+  },
+
+  viewName:{
+    justifyContent: 'flex-start',
+    flexDirection: 'row'
+  },
+
+  viewEdit:{
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+    marginEnd: 'auto'
+  },
+
+  box1:{
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'blue'
+  },
+
+  box2:{
+    width: 50,
+    height: 50,
+    backgroundColor: 'blue'
   },
 
   container2: {
@@ -74,10 +121,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
 
-  container: {
-    
+  container: { 
     padding: 20,
-    
   },
 
   label1:{
@@ -114,16 +159,17 @@ const styles = StyleSheet.create({
     borderColor: 'black',
 
   },
-  
 
-   
-    
+  label31:{
+    fontSize: 15,
+    borderColor: 'black',
+
+  },
   
   image: {
     width: 200,
     height: 200,
     resizeMode: 'contain',
-    
   },
 
 });

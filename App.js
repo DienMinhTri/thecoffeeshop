@@ -7,6 +7,7 @@ import MyorderHistory from './src/screens/Main/HistoryTab/MyorderHistory';
 import Review_request from './src/screens/Main/HomeTab/Review_request';
 import StackNavigation from './src/navigation/StackNavigation';
 import { NavigationContainer } from '@react-navigation/native';
+import ItemDetail from './src/components/ItemDetail';
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
     // <MyorderCurrent/>
     // <MyorderHistory/>
     // <Review_request/>
+    // <ItemDetail/>
     <NavigationContainer>
       <StackNavigation />
     </NavigationContainer>

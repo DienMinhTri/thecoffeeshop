@@ -65,7 +65,8 @@ const Account = () => {
       </View>
 
       {/* ĐIỂM TÍCH LŨY */}
-      <TouchableOpacity style={{ flexDirection: 'row', marginTop: 30 }}>
+      <TouchableOpacity 
+      style={{ flexDirection: 'row', marginTop: 30 }}>
         <View style={appStyle.circle}>
           <FastImage tintColor={COLOR.primary} source={ICON.Gift} style={appStyle.iconMedium} resizeMode='stretch' />
         </View>

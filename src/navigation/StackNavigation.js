@@ -17,6 +17,7 @@ import Account from '../screens/Main/ProfileTab/Account';
 import Forgot_password from '../screens/Begin/Forgot_password';
 import MyCart from '../screens/Main/HomeTab/MyCart';
 import UpdateAccount from '../screens/Main/ProfileTab/UpdateAccount';
+import Reward from '../screens/Main/ProfileTab/Reward';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -79,7 +80,7 @@ const StackProfile = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Account" component={Account}></Stack.Screen>
       <Stack.Screen name="UpdateAccount" component={UpdateAccount}></Stack.Screen>
-
+      <Stack.Screen name="Reward" component={Reward}></Stack.Screen>
     </Stack.Navigator>
   )
 };

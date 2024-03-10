@@ -4,6 +4,7 @@ import { appStyle, windowHeight, windowWidth } from '../../../constants/AppStyle
 import FastImage from 'react-native-fast-image'
 import { COLOR, ICON } from '../../../constants/Theme'
 import { useNavigation } from '@react-navigation/native'
+import Reward from './Reward'
 
 const Account = () => {
   const navigation = useNavigation();
@@ -65,7 +66,7 @@ const Account = () => {
       </View>
 
       {/* ĐIỂM TÍCH LŨY */}
-      <TouchableOpacity style={{ flexDirection: 'row', marginTop: 30 }}>
+      <TouchableOpacity onPress={ () => navigation.navigate('Reward')} style={{ flexDirection: 'row', marginTop: 30 }}>
         <View style={appStyle.circle}>
           <FastImage tintColor={COLOR.primary} source={ICON.Gift} style={appStyle.iconMedium} resizeMode='stretch' />
         </View>

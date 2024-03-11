@@ -13,6 +13,12 @@ const Reward = () => {
         <Text style={[appStyle.text22, { marginEnd: windowWidth * 0.40 }]}>Reward</Text>
       </View>
 
+     <view>
+      
+     </view>
+       
+          
+
       
 
     </SafeAreaView>

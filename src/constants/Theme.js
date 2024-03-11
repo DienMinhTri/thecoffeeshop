@@ -51,5 +51,6 @@ export const ICON = {
     Flatwhite: require('../media/images/flatwhite.png'),
     Raf: require('../media/images/raf.png'),
     Espresso: require('../media/images/espresso.png'),
+    Cafe: require('../media/images/cafe.png'),
 
 }

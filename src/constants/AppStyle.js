@@ -40,6 +40,24 @@ export const appStyle = StyleSheet.create({
         borderColor: COLOR.primary
     },
 
+    hcn:{
+        width: 360,
+        height: 120,
+        borderRadius: 10,
+        backgroundColor: COLOR.primary,  
+        margin:6,
+        justifyContent: 'center',
+    
+    },
+
+    hcnn:{
+            width: 70,
+            height: 40,
+            borderRadius: 8,
+            backgroundColor: '#FFFF',
+            margin: 5,
+    },
+
     //---------ICON-----------------//
     iconSmall: {
         width: 16,

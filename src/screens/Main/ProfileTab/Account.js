@@ -28,7 +28,7 @@ const Account = () => {
         </View>
         <View style={{ marginLeft: 20 }}>
           <Text style={[appStyle.text14, { color: COLOR.grayText }]}>Tên</Text>
-          <Text style={[appStyle.text20, { color: COLOR.primary }]}>Alex</Text>
+          <Text style={[appStyle.text20, { color: COLOR.primary }]}>Trí</Text>
         </View>
       </View>
 

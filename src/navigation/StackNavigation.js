@@ -1,12 +1,9 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React, { useState } from 'react'
-import Review_request from '../screens/Main/HomeTab/Review_request';
-import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Startup_screen from '../screens/Begin/Startup_screen';
 import Authorization from '../screens/Begin/Authorization';
 import Home from '../screens/Main/HomeTab/Home';
-import FastImage from 'react-native-fast-image';
 import { COLOR, ICON } from '../constants/Theme';
 import { appStyle, windowHeight } from '../constants/AppStyle';
 import Registration from '../screens/Begin/Registration';
@@ -18,6 +15,7 @@ import Forgot_password from '../screens/Begin/Forgot_password';
 import MyCart from '../screens/Main/HomeTab/MyCart';
 import UpdateAccount from '../screens/Main/ProfileTab/UpdateAccount';
 import Reward from '../screens/Main/ProfileTab/Reward';
+import OrderDetail from '../screens/Main/HomeTab/OrderDetail';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -25,22 +23,6 @@ const Tab = createBottomTabNavigator();
 
 const StackBegin = () => {
   return (
-    // <NavigationContainer>
-    //   <Stack.Navigator screenOptions={{headerShown:false}}>
-    //       <Stack.Screen name="Current" component={MyorderCurrent}/>
-    //       <Stack.Screen name="History" component={MyorderHistory}/>
-    //       <Stack.Screen name="Report" component={Review_request}/>
-    //   </Stack.Navigator>
-    // </NavigationContainer>
-
-    // <NavigationContainer>
-    //   <Stack.Navigator
-    //     initialRouteName="Start"
-    //     screenOptions={{ headerShown: false }}>
-    //     <Stack.Screen name='Start' component={Startup_screen} />
-    //     <Stack.Screen name='Authorization' component={Authorization} />
-    //   </Stack.Navigator>
-    // </NavigationContainer>
 
     <Stack.Navigator
       initialRouteName="Start"
@@ -60,10 +42,9 @@ const StackHome = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Home" component={Home}></Stack.Screen>
       <Stack.Screen name="MyCart" component={MyCart}></Stack.Screen>
-
-
+      <Stack.Screen name="OrderDetail" component={OrderDetail} />
     </Stack.Navigator>
-  )
+  );
 };
 
 const StackHistory = () => {
@@ -72,7 +53,7 @@ const StackHistory = () => {
       <Stack.Screen name="MyorderCurrent" component={MyorderCurrent}></Stack.Screen>
       <Stack.Screen name="MyorderHistory" component={MyorderHistory}></Stack.Screen>
     </Stack.Navigator>
-  )
+  );
 };
 
 const StackProfile = () => {
@@ -91,7 +72,7 @@ const Main = () => {
       initialRouteName="StackHome"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName = focused;
+          let iconName, label;
 
           if (route.name === 'StackHome') {
             iconName = focused ? ICON.HomeFocus : ICON.Home;
@@ -106,7 +87,6 @@ const Main = () => {
             iconName = focused ? ICON.AccountFocus : ICON.Account;
             label = "Hồ sơ";
           }
-          // You can return any component that you like here!
           return (
             <View
               style={{
@@ -160,7 +140,7 @@ const StackNavigation = () => {
   return (
     <>
       {
-        isLogin == true ? <StackBegin /> : <Main />
+        isLogin ? <Main /> : <StackBegin />
       }
     </>
 

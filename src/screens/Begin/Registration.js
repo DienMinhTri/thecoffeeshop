@@ -1,13 +1,45 @@
 import { StyleSheet, Text, View, Image, TextInput, SafeAreaView, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { appStyle, windowHeight, windowWidth } from '../../constants/AppStyle'
 import FastImage from 'react-native-fast-image'
 import { COLOR, ICON } from '../../constants/Theme'
-import AppButton from '../../components/AppButton'
 import { useNavigation } from '@react-navigation/native'
+import AppButton from '../../components/AppButton'
+import axios from 'axios';
 
 const Registration = () => {
     const navigation = useNavigation();
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const registerUser = () => {
+        if (isValidInput()) {
+            axios.post('http://10.0.2.2:3000/users/register', { name, email, password }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        alert('User registered successfully!');
+                        setName(response.data.name);
+                    } else {
+                        throw new Error('Failed to register user');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error registering user:', error);
+                    alert('Failed to register user. Please try again later.');
+                });
+        } else {
+            alert('Please fill in all fields');
+        }
+    };
+
+    const isValidInput = () => {
+        return name.trim() !== '' && email.trim() !== '' && password.trim() !== '';
+    };
 
     return (
         <SafeAreaView style={appStyle.container}>
@@ -25,7 +57,14 @@ const Registration = () => {
                     <FastImage tintColor={COLOR.primary} resizeMode="stretch" source={ICON.Account} style={[appStyle.icon, { width: 26 }]} />
                     <Text style={{ fontSize: 35, color: COLOR.lightText, fontWeight: '200' }}>|</Text>
                 </View>
-                <TextInput style={{ marginLeft: 25 }} placeholder="Create an account here" placeholderTextColor='#C1C7D0' fontSize={16} >
+                <TextInput
+                    style={{ marginLeft: 25 }}
+                    placeholder="Create an account here"
+                    placeholderTextColor='#C1C7D0'
+                    fontSize={16}
+                    value={name}
+                    onChangeText={text => setName(text)}
+                >
                 </TextInput>
             </View>
 
@@ -35,7 +74,14 @@ const Registration = () => {
                     <FastImage tintColor={COLOR.primary} resizeMode="stretch" source={ICON.Mail} style={[appStyle.icon, { width: 26 }]} />
                     <Text style={{ fontSize: 35, color: COLOR.lightText, fontWeight: '200' }}>|</Text>
                 </View>
-                <TextInput style={{ marginLeft: 25 }} placeholder="Email address" placeholderTextColor='#C1C7D0' fontSize={16} >
+                <TextInput
+                    style={{ marginLeft: 25 }}
+                    placeholder="Email address"
+                    placeholderTextColor='#C1C7D0'
+                    fontSize={16}
+                    value={email}
+                    onChangeText={text => setEmail(text)}
+                >
                 </TextInput>
             </View>
 
@@ -45,7 +91,14 @@ const Registration = () => {
                     <FastImage tintColor={COLOR.primary} resizeMode="stretch" source={ICON.Lock} style={[appStyle.icon, { height: 26 }]} />
                     <Text style={{ fontSize: 35, color: COLOR.lightText, fontWeight: '200' }}>|</Text>
                 </View>
-                <TextInput style={styles.input} placeholderTextColor='#C1C7D0' placeholder="Password" fontSize={16} >
+                <TextInput
+                    style={styles.input}
+                    placeholderTextColor='#C1C7D0'
+                    placeholder="Password"
+                    fontSize={16}
+                    value={password}
+                    onChangeText={text => setPassword(text)}
+                >
                 </TextInput>
                 <TouchableOpacity>
                     <FastImage tintColor={COLOR.primary} resizeMode="stretch" source={ICON.Eye} style={[appStyle.icon, { width: 26 }]} />
@@ -53,7 +106,7 @@ const Registration = () => {
             </View>
 
             {/* FORGOT PASSWORD */}
-            <Text style={[appStyle.text16, { color: COLOR.primary, fontWeight:'400', marginTop:20 }]}>
+            <Text style={[appStyle.text16, { color: COLOR.primary, fontWeight: '400', marginTop: 20 }]}>
                 By signing up you agree with our Terms of Use
 
             </Text>
@@ -66,6 +119,14 @@ const Registration = () => {
                     width={70}
                     height={70}
                     borderRadius={35}
+                    onPress={() => {
+                        if (isValidInput()) {
+                            registerUser();
+                            navigation.navigate('Authorization')
+                        } else {
+                            alert('Please fill in all fields');
+                        }
+                    }}
                 />
             </View>
 

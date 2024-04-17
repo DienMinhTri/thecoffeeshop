@@ -1,13 +1,42 @@
-import { StyleSheet, Text, View, Image, TextInput, SafeAreaView, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, Image, TextInput, SafeAreaView, TouchableOpacity, Alert } from 'react-native'
+import React, { useState } from 'react'
 import { appStyle, windowHeight, windowWidth } from '../../constants/AppStyle'
 import FastImage from 'react-native-fast-image'
 import { COLOR, ICON } from '../../constants/Theme'
 import AppButton from '../../components/AppButton'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native'
+import axios from 'axios';
 
 const Authorization = () => {
     const navigation = useNavigation();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = async () => {
+        try {
+            const response = await axios.post('http://10.0.2.2:3000/users/login', {
+                email: email,
+                password: password
+            });
+            console.log('Server response:', response.data);
+            if (response.data && response.data.user && response.data.user._id) {
+                await AsyncStorage.setItem('userId', response.data.user._id);
+                // navigation.navigate('StackHome', { name: response.data.name });
+                Alert.alert('Login successful');
+            } else {
+                Alert.alert('Login failed', 'Token not found in server response');
+            }
+        } catch (error) {
+            console.log('Login error:', error);
+            if (error.response && error.response.data) {
+                Alert.alert('Login failed', error.response.data.message);
+            } else {
+                Alert.alert('Login failed', 'An error occurred during login.');
+            }
+        }
+    };
+
 
     const handleSignUp = () => {
         navigation.navigate('Registration');
@@ -22,7 +51,7 @@ const Authorization = () => {
             <TouchableOpacity onPress={() => navigation.goBack()}>
                 <FastImage resizeMode="stretch" source={ICON.Back} style={appStyle.icon} />
             </TouchableOpacity>
-            <View style={{ marginTop: windowHeight * 0.06, marginBottom: windowHeight*0.04 }}>
+            <View style={{ marginTop: windowHeight * 0.06, marginBottom: windowHeight * 0.04 }}>
                 <Text style={appStyle.text24}>Sign in</Text>
                 <Text style={[appStyle.text16, { color: COLOR.lightText, marginTop: 27 }]}>Welcome back</Text>
             </View>
@@ -33,7 +62,14 @@ const Authorization = () => {
                     <FastImage tintColor={COLOR.primary} resizeMode="stretch" source={ICON.Mail} style={[appStyle.icon, { width: 26 }]} />
                     <Text style={{ fontSize: 35, color: COLOR.lightText, fontWeight: '200' }}>|</Text>
                 </View>
-                <TextInput style={{ marginLeft: 25 }} placeholder="Email address" placeholderTextColor='#C1C7D0' fontSize={16} >
+                <TextInput
+                    style={{ marginLeft: 25 }}
+                    placeholder="Email address"
+                    placeholderTextColor='#C1C7D0'
+                    fontSize={16}
+                    value={email}
+                    onChangeText={setEmail}
+                >
                 </TextInput>
             </View>
 
@@ -43,7 +79,15 @@ const Authorization = () => {
                     <FastImage tintColor={COLOR.primary} resizeMode="stretch" source={ICON.Lock} style={[appStyle.icon, { height: 26 }]} />
                     <Text style={{ fontSize: 35, color: COLOR.lightText, fontWeight: '200' }}>|</Text>
                 </View>
-                <TextInput style={styles.input} placeholderTextColor='#C1C7D0' placeholder="Password" fontSize={16} >
+                <TextInput
+                    style={styles.input}
+                    placeholderTextColor='#C1C7D0'
+                    placeholder="Password"
+                    fontSize={16}
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                >
                 </TextInput>
                 <TouchableOpacity>
                     <FastImage tintColor={COLOR.primary} resizeMode="stretch" source={ICON.Eye} style={[appStyle.icon, { width: 26 }]} />
@@ -52,8 +96,8 @@ const Authorization = () => {
 
             {/* FORGOT PASSWORD */}
             <TouchableOpacity
-            onPress={()=> handleForgot()} 
-            style={{ width: windowWidth * 0.32, alignSelf: 'center', borderBottomWidth: 1, borderColor: COLOR.primary, marginTop: 30 }}>
+                onPress={() => handleForgot()}
+                style={{ width: windowWidth * 0.32, alignSelf: 'center', borderBottomWidth: 1, borderColor: COLOR.primary, marginTop: 30 }}>
                 <Text style={[appStyle.text16Bold, { color: COLOR.primary }]}>Forgot Password?</Text>
             </TouchableOpacity>
 
@@ -64,6 +108,7 @@ const Authorization = () => {
                     width={70}
                     height={70}
                     borderRadius={35}
+                    onPress={handleLogin}
                 />
             </View>
 
@@ -119,7 +164,7 @@ const styles = StyleSheet.create({
         width: windowWidth * 0.9,
         height: 50,
         marginTop: 20,
-        borderColor: COLOR.grayText, 
+        borderColor: COLOR.grayText,
         borderBottomWidth: 0.7,
         flexDirection: 'row',
         alignItems: 'center'

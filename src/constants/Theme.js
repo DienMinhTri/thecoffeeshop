@@ -42,6 +42,7 @@ export const ICON = {
     More: require('../media/icons/more.png'),
     Gift: require('../media/icons/gift.png'),
     Save: require('../media/icons/save.png'),
+    Find: require('../media/icons/find.png'),
 
     //---------IMAGE----------//
     Start: require('../media/images/startScreen.png'),

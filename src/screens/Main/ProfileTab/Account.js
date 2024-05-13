@@ -1,17 +1,33 @@
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native'
+import React, { useState, useEffect } from 'react'
 import { appStyle, windowHeight, windowWidth } from '../../../constants/AppStyle'
 import FastImage from 'react-native-fast-image'
 import { COLOR, ICON } from '../../../constants/Theme'
 import { useNavigation } from '@react-navigation/native'
-import Reward from './Reward'
+import { useDispatch } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logoutSuccess } from '../../../redux/authSlice'
 
-const Account = () => {
+const Account = ({route}) => {
   const navigation = useNavigation();
+  // const { name, email } = route.params;
+  const dispatch = useDispatch();
 
   const handleUpdate = () => {
     navigation.navigate('UpdateAccount');
   };
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('userToken');
+      dispatch(logoutSuccess());
+      Alert.alert('Logout successful');
+    } catch (error) {
+      console.log('Logout error:', error);
+      Alert.alert('Logout failed', 'An error occurred during logout.');
+    }
+  };
+
   return (
     <SafeAreaView style={appStyle.container}>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
@@ -28,7 +44,7 @@ const Account = () => {
         </View>
         <View style={{ marginLeft: 20 }}>
           <Text style={[appStyle.text14, { color: COLOR.grayText }]}>Tên</Text>
-          <Text style={[appStyle.text20, { color: COLOR.primary }]}>Trí</Text>
+          <Text style={[appStyle.text20, { color: COLOR.primary }]}>name</Text>
         </View>
       </View>
 
@@ -39,7 +55,7 @@ const Account = () => {
         </View>
         <View style={{ marginLeft: 20 }}>
           <Text style={[appStyle.text14, { color: COLOR.grayText }]}>Số điện thoại</Text>
-          <Text style={[appStyle.text20, { color: COLOR.primary }]}>0935147321</Text>
+          <Text style={[appStyle.text20, { color: COLOR.primary }]}>Phone</Text>
         </View>
       </View>
 
@@ -50,7 +66,7 @@ const Account = () => {
         </View>
         <View style={{ marginLeft: 20 }}>
           <Text style={[appStyle.text14, { color: COLOR.grayText }]}>Email</Text>
-          <Text style={[appStyle.text20, { color: COLOR.primary }]}>acc@gmail.com</Text>
+          <Text style={[appStyle.text20, { color: COLOR.primary }]}>email</Text>
         </View>
       </View>
 
@@ -61,12 +77,12 @@ const Account = () => {
         </View>
         <View style={{ marginLeft: 20 }}>
           <Text style={[appStyle.text14, { color: COLOR.grayText }]}>Địa chỉ</Text>
-          <Text style={[appStyle.text20, { color: COLOR.primary }]}>Quận 12, TP.HCM</Text>
+          <Text style={[appStyle.text20, { color: COLOR.primary }]}>address</Text>
         </View>
       </View>
 
       {/* ĐIỂM TÍCH LŨY */}
-      <TouchableOpacity onPress={ () => navigation.navigate('Reward')} style={{ flexDirection: 'row', marginTop: 30 }}>
+      <TouchableOpacity onPress={() => navigation.navigate('Reward')} style={{ flexDirection: 'row', marginTop: 30 }}>
         <View style={appStyle.circle}>
           <FastImage tintColor={COLOR.primary} source={ICON.Gift} style={appStyle.iconMedium} resizeMode='stretch' />
         </View>
@@ -81,7 +97,7 @@ const Account = () => {
           style={[appStyle.icon, { alignSelf: 'center', marginLeft: windowWidth * 0.5 }]} />
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.logout} >
+      <TouchableOpacity style={styles.logout} onPress={handleLogout}>
         <Text style={[appStyle.text18, { color: COLOR.delete }]}>Đăng xuất</Text>
       </TouchableOpacity>
     </SafeAreaView>

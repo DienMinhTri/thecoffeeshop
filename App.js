@@ -2,28 +2,22 @@ import React from 'react'
 
 import StackNavigation from './src/navigation/StackNavigation';
 import { NavigationContainer } from '@react-navigation/native';
-import Reward from './src/screens/Main/ProfileTab/Reward';
+import { Provider } from 'react-redux';
+import store from './src/redux/store';
+import { StripeProvider } from '@stripe/stripe-react-native';
 
 const App = () => {
   return (
-    // <Welcome/>
-    // <Authorization/>
-    // <Registration/>
-    // <Forgot_password/>
-    // <Two_factor_verification/>
-    // <Startup_screen/>
-    // <MyorderCurrent/>
-    // <MyorderHistory/>
-    // <Review_request/>
-    <NavigationContainer>
-      <StackNavigation />
-    </NavigationContainer>
-      // <StackNavigation />
-      // <Reward></Reward>
-
-
-
-  )
-}
+    <StripeProvider
+      publishableKey="pk_test_51PA9vlRsfm3Ucs22ixDUZ8mt2Ki9E7WR4tSil67ONZD4dptsAwjVZ0J2IFNEEf0iHQhDNEaTT87f6mTD9dnY1lAW00TQcuO9MO"
+    >
+      <Provider store={store}>
+        <NavigationContainer>
+          <StackNavigation />
+        </NavigationContainer>
+      </Provider>
+    </StripeProvider>
+  );
+};
 
 export default App;

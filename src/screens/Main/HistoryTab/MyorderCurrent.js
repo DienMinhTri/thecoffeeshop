@@ -1,33 +1,33 @@
-import { StyleSheet, Text, View, Image, Pressable } from 'react-native'
+import { StyleSheet, Text, View, Image, Pressable, FlatList } from 'react-native'
 import React from 'react'
 import FastImage from 'react-native-fast-image';
 import { ICON } from '../../../constants/Theme';
+import { useCart } from '../../../context/CartContext'
 import { appStyle } from '../../../constants/AppStyle';
 
-const MyorderCurrent = (props) => {
-    const { navigation } = props;
+const MyorderCurrent = ({ route, navigation }) => {
+
+    const cartItems = route.params && Array.isArray(route.params.cartItems) ? route.params.cartItems : [];
+    console.log('Cart Items:', cartItems);
+
+    const renderItem = ({ item }) => (
+        <View style={styles.item}>
+            <FastImage resizeMode='stretch' source={ICON.Coffee} style={appStyle.iconMedium} />
+            <View>
+                <Text style={styles.title2}>{item.name} x {item.quantity}</Text>
+                <Text style={styles.title3}>{item.price}đ</Text>
+            </View>
+        </View>
+    );
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>My Order</Text>
 
             <View style={styles.form}>
-
-                <View>
-                    <Text style={styles.history}>On going</Text>
-                    <View style={styles.rectangle}>
-                        <Text></Text>
-                    </View>
+                <View style={styles.rectangle}>
+                    <Text></Text>
                 </View>
-
-                <Pressable onPress={() => navigation.navigate('MyorderHistory')}>
-                    <View>
-                        <Text style={styles.ongoing}>History</Text>
-                        <View style={styles.rectangle1}>
-                            <Text></Text>
-                        </View>
-                    </View>
-                </Pressable>
             </View>
 
             <View style={styles.rectangle2}>
@@ -39,43 +39,22 @@ const MyorderCurrent = (props) => {
                     <Text style={styles.title1}>24 June | 12:30 PM | by 18:10</Text>
                     <View style={styles.form1}>
                         <FastImage resizeMode='stretch' source={ICON.Coffee} style={appStyle.iconMedium} />
-                        <Text style={styles.title2}>Americano</Text>
-                    </View>
-
-                    <View style={styles.form1}>
-                        <FastImage resizeMode='stretch' source={ICON.Location} style={appStyle.iconMedium} />
-                        <Text style={styles.title2}>Bradford BD1 1PR</Text>
-                    </View>
-                </View>
-
-                <View style={styles.form3}>
-                    <Text style={styles.title3}>BYN 3.00</Text>
-
-                </View>
-            </View>
-
-            <View style={styles.rectangle3}>
-                <Text></Text>
-            </View>
-
-            <View style={styles.form2}>
-                <View>
-                    <Text style={styles.title1}>24 June | 12:30 PM | by 18:10</Text>
-                    <View style={styles.form1}>
-                        <FastImage resizeMode='stretch' source={ICON.Coffee} style={appStyle.iconMedium} />
-
-                        <Text style={styles.title2}>Americano</Text>
-                    </View>
-
-                    <View style={styles.form1}>
-                        <FastImage resizeMode='stretch' source={ICON.Location} style={appStyle.iconMedium} />
-                        <Text style={styles.title2}>Bradford BD1 1PR</Text>
+                        <FlatList
+                            data={cartItems}
+                            renderItem={renderItem}
+                            keyExtractor={(item, index) => index.toString()}
+                        />
                     </View>
                 </View>
 
                 <View style={styles.form3}>
-                    <Text style={styles.title3}>BYN 3.00</Text>
-
+                    <View>
+                        {cartItems.map((item, index) => (
+                            <View key={index}>
+                                <Text style={styles.title3}>{item.price}đ</Text>
+                            </View>
+                        ))}
+                    </View>
                 </View>
             </View>
 

@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, Image, TextInput, SafeAreaView, TouchableOpacity, Alert } from 'react-native'
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux';
 import { appStyle, windowHeight, windowWidth } from '../../constants/AppStyle'
 import FastImage from 'react-native-fast-image'
 import { COLOR, ICON } from '../../constants/Theme'
@@ -7,11 +8,14 @@ import AppButton from '../../components/AppButton'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios';
+import { loginSuccess } from '../../redux/authSlice'
 
 const Authorization = () => {
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const dispatch = useDispatch();
 
     const handleLogin = async () => {
         try {
@@ -19,11 +23,17 @@ const Authorization = () => {
                 email: email,
                 password: password
             });
+
             console.log('Server response:', response.data);
-            if (response.data && response.data.user && response.data.user._id) {
-                await AsyncStorage.setItem('userId', response.data.user._id);
-                // navigation.navigate('StackHome', { name: response.data.name });
+
+            if (response.data && response.data.token) {
+                // Lưu trữ token vào AsyncStorage
+                await AsyncStorage.setItem('userToken', response.data.token);
+                dispatch(loginSuccess(response.data.userDetails));
                 Alert.alert('Login successful');
+
+                const storedToken = await AsyncStorage.getItem('userToken');
+                console.log('Stored token:', storedToken);
             } else {
                 Alert.alert('Login failed', 'Token not found in server response');
             }
@@ -36,7 +46,6 @@ const Authorization = () => {
             }
         }
     };
-
 
     const handleSignUp = () => {
         navigation.navigate('Registration');

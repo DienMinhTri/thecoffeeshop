@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Startup_screen from '../screens/Begin/Startup_screen';
 import Authorization from '../screens/Begin/Authorization';
@@ -16,6 +17,8 @@ import MyCart from '../screens/Main/HomeTab/MyCart';
 import UpdateAccount from '../screens/Main/ProfileTab/UpdateAccount';
 import Reward from '../screens/Main/ProfileTab/Reward';
 import OrderDetail from '../screens/Main/HomeTab/OrderDetail';
+import PaymentScreen from '../screens/Main/HomeTab/PaymentScreen';
+import { CartProvider } from '../context/CartContext';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -28,9 +31,13 @@ const StackBegin = () => {
       initialRouteName="Start"
       screenOptions={{ headerShown: false }}>
       <Stack.Screen name='Start' component={Startup_screen} />
+      {props => <Startup_screen {...props} />}
       <Stack.Screen name='Authorization' component={Authorization} />
+      {props => <Authorization {...props} />}
       <Stack.Screen name='Registration' component={Registration} />
+      {props => <Registration {...props} />}
       <Stack.Screen name='ForgotPassword' component={Forgot_password} />
+      {props => <Forgot_password {...props} />}
     </Stack.Navigator>
 
 
@@ -39,20 +46,25 @@ const StackBegin = () => {
 
 const StackHome = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Home" component={Home}></Stack.Screen>
-      <Stack.Screen name="MyCart" component={MyCart}></Stack.Screen>
-      <Stack.Screen name="OrderDetail" component={OrderDetail} />
-    </Stack.Navigator>
+    <CartProvider>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Home" component={Home}></Stack.Screen>
+        <Stack.Screen name="MyCart" component={MyCart}></Stack.Screen>
+        <Stack.Screen name="OrderDetail" component={OrderDetail} />
+        <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+      </Stack.Navigator>
+    </CartProvider>
   );
 };
 
 const StackHistory = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="MyorderCurrent" component={MyorderCurrent}></Stack.Screen>
-      <Stack.Screen name="MyorderHistory" component={MyorderHistory}></Stack.Screen>
-    </Stack.Navigator>
+    <CartProvider>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="MyorderCurrent" component={MyorderCurrent}></Stack.Screen>
+        <Stack.Screen name="MyorderHistory" component={MyorderHistory}></Stack.Screen>
+      </Stack.Navigator>
+    </CartProvider>
   );
 };
 
@@ -66,7 +78,7 @@ const StackProfile = () => {
   )
 };
 
-const Main = () => {
+const Main = ({ name }) => {
   return (
     <Tab.Navigator
       initialRouteName="StackHome"
@@ -128,19 +140,22 @@ const Main = () => {
         },
       })}
     >
-      <Tab.Screen name="StackHome" component={StackHome} />
+      <Tab.Screen name="StackHome" component={StackHome} initialParams={{ name }} />
+      {props => <StackHome {...props} />}
       <Tab.Screen name="StackHistory" component={StackHistory} />
+      {props => <StackHistory {...props} />}
       <Tab.Screen name="StackProfile" component={StackProfile} />
+      {props => <StackProfile {...props} />}
     </Tab.Navigator>
   )
 };
 
 const StackNavigation = () => {
-  const [isLogin, setIsLogin] = useState(false);
+  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
   return (
     <>
       {
-        isLogin ? <Main /> : <StackBegin />
+        isLoggedIn ? <Main /> : <StackBegin />
       }
     </>
 

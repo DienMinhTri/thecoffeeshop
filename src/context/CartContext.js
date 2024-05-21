@@ -11,10 +11,12 @@ export const CartProvider = ({ children }) => {
         setCartItemCount(cartItems.length + 1);
     };
     const removeFromCart = (index) => {
-        const updatedCartItems = [...cartItems];
-        updatedCartItems.splice(index, 1);
-        setCartItems(updatedCartItems);
-        setCartItemCount(updatedCartItems.length);
+        setCartItems(prevCartItems => {
+            const updatedCartItems = [...prevCartItems];
+            updatedCartItems.splice(index, 1);
+            setCartItemCount(updatedCartItems.length);
+            return updatedCartItems;
+        });
     };
     return (
         <CartContext.Provider value={{ cartItems, cartItemCount, addToCart, removeFromCart }}>

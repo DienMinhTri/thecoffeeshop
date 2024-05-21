@@ -62,7 +62,10 @@ const OrderDetail = ({ product, route }) => {
     }
   };
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, width: '100%',}}>
+      <TouchableOpacity onPress={handleGoBack} style={styles.goBackButton}>
+          <Text style={styles.goBackText}>Quay lại</Text>
+        </TouchableOpacity>
       <ScrollView scrollEnabled={true}>
         <View style={styles.container}>
           <Image source={{ uri: item.image }} style={styles.image} />
@@ -111,9 +114,6 @@ const OrderDetail = ({ product, route }) => {
           </Button>
           <Button mode="contained" onPress={addToCartHandler} title="Thêm vào giỏ hàng">Thêm vào giỏ hàng</Button>
         </View>
-        <TouchableOpacity onPress={handleGoBack} style={styles.goBackButton}>
-          <Text style={styles.goBackText}>Quay lại</Text>
-        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   )
@@ -135,13 +135,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#DDDDDD',
     padding: 10,
     borderRadius: 10,
-    width: 100,
-    height: 50,
+    width: 80,
+    height: 40,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginLeft : 10
   },
   goBackText: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
   },
   toppingContainer: {

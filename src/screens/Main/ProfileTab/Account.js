@@ -1,5 +1,5 @@
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { appStyle, windowHeight, windowWidth } from '../../../constants/AppStyle'
 import FastImage from 'react-native-fast-image'
 import { COLOR, ICON } from '../../../constants/Theme'
@@ -7,11 +7,13 @@ import { useNavigation } from '@react-navigation/native'
 import { useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logoutSuccess } from '../../../redux/authSlice'
+import { UserContext } from '../../../context/UserContext'
 
-const Account = ({route}) => {
+const Account = ({ route }) => {
   const navigation = useNavigation();
   // const { name, email } = route.params;
   const dispatch = useDispatch();
+  const { userData, fetchUserData } = useContext(UserContext);
 
   const handleUpdate = () => {
     navigation.navigate('UpdateAccount');
@@ -27,6 +29,12 @@ const Account = ({route}) => {
       Alert.alert('Logout failed', 'An error occurred during logout.');
     }
   };
+
+  useEffect(() => {
+
+    // Gọi hàm fetchUserData khi component được mount
+    fetchUserData();
+  }, []);
 
   return (
     <SafeAreaView style={appStyle.container}>
@@ -44,7 +52,9 @@ const Account = ({route}) => {
         </View>
         <View style={{ marginLeft: 20 }}>
           <Text style={[appStyle.text14, { color: COLOR.grayText }]}>Tên</Text>
-          <Text style={[appStyle.text20, { color: COLOR.primary }]}>name</Text>
+          {userData && userData.user && (
+            <Text style={[appStyle.text20, { color: COLOR.primary }]}>{userData.user.name}</Text>
+          )}
         </View>
       </View>
 
@@ -55,7 +65,9 @@ const Account = ({route}) => {
         </View>
         <View style={{ marginLeft: 20 }}>
           <Text style={[appStyle.text14, { color: COLOR.grayText }]}>Số điện thoại</Text>
-          <Text style={[appStyle.text20, { color: COLOR.primary }]}>Phone</Text>
+          {userData && userData.user && (
+            <Text style={[appStyle.text20, { color: COLOR.primary }]}>{userData.user.phone}</Text>
+          )}
         </View>
       </View>
 
@@ -66,7 +78,9 @@ const Account = ({route}) => {
         </View>
         <View style={{ marginLeft: 20 }}>
           <Text style={[appStyle.text14, { color: COLOR.grayText }]}>Email</Text>
-          <Text style={[appStyle.text20, { color: COLOR.primary }]}>email</Text>
+          {userData && userData.user && (
+            <Text style={[appStyle.text20, { color: COLOR.primary }]}>{userData.user.email}</Text>
+          )}
         </View>
       </View>
 
@@ -77,7 +91,9 @@ const Account = ({route}) => {
         </View>
         <View style={{ marginLeft: 20 }}>
           <Text style={[appStyle.text14, { color: COLOR.grayText }]}>Địa chỉ</Text>
-          <Text style={[appStyle.text20, { color: COLOR.primary }]}>address</Text>
+          {userData && userData.user && (
+            <Text style={[appStyle.text20, { color: COLOR.primary }]}>{userData.user.address}</Text>
+          )}
         </View>
       </View>
 

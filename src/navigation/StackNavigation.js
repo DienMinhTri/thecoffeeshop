@@ -78,7 +78,7 @@ const StackProfile = () => {
   )
 };
 
-const Main = ({ name }) => {
+const Main = () => {
   return (
     <Tab.Navigator
       initialRouteName="StackHome"
@@ -140,7 +140,7 @@ const Main = ({ name }) => {
         },
       })}
     >
-      <Tab.Screen name="StackHome" component={StackHome} initialParams={{ name }} />
+      <Tab.Screen name="StackHome" component={StackHome} />
       {props => <StackHome {...props} />}
       <Tab.Screen name="StackHistory" component={StackHistory} />
       {props => <StackHistory {...props} />}

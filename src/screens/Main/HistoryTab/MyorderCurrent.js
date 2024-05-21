@@ -1,59 +1,74 @@
-import { StyleSheet, Text, View, Image, Pressable, FlatList } from 'react-native'
-import React from 'react'
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, ActivityIndicator, Button, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import axios from 'axios';
 import FastImage from 'react-native-fast-image';
-import { ICON } from '../../../constants/Theme';
-import { useCart } from '../../../context/CartContext'
-import { appStyle } from '../../../constants/AppStyle';
 
 const MyorderCurrent = ({ route, navigation }) => {
+    const [carts, setCarts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [dataChanged, setDataChanged] = useState(false);
 
-    const cartItems = route.params && Array.isArray(route.params.cartItems) ? route.params.cartItems : [];
-    console.log('Cart Items:', cartItems);
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get('http://10.0.2.2:3000/apiMyCart/listcart');
+                setCarts(response.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [route, dataChanged]); // Listen for changes in route param and dataChanged to trigger fetching new data
+
+    const handleDataChange = () => {
+        setDataChanged(!dataChanged); // Toggle dataChanged to trigger re-render
+    };
 
     const renderItem = ({ item }) => (
         <View style={styles.item}>
-            <FastImage resizeMode='stretch' source={ICON.Coffee} style={appStyle.iconMedium} />
+            <FastImage resizeMode='stretch' source={{ uri: item.image }} style={styles.image} />
             <View>
-                <Text style={styles.title2}>{item.name} x {item.quantity}</Text>
+                <Text style={styles.name}>{item.name} x {item.quantity}</Text>
                 <Text style={styles.title3}>{item.price}đ</Text>
+                {item.createdAt && (
+                    <Text>Ordered at: {item.createdAt}</Text>
+                )}
             </View>
-        </View>
+        </View> 
     );
+
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>My Order</Text>
-
-            <View style={styles.form}>
-                <View style={styles.rectangle}>
-                    <Text></Text>
-                </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text style={styles.title}>My Order</Text>
+                <TouchableOpacity onPress={handleDataChange}>
+                    <Image style={{ width: 15, height: 15, marginTop: 25 }} source={require('../../../media/icons/loading.png')} />
+                </TouchableOpacity>
             </View>
-
             <View style={styles.rectangle2}>
                 <Text></Text>
             </View>
 
             <View style={styles.form2}>
                 <View>
-                    <Text style={styles.title1}>24 June | 12:30 PM | by 18:10</Text>
                     <View style={styles.form1}>
-                        <FastImage resizeMode='stretch' source={ICON.Coffee} style={appStyle.iconMedium} />
                         <FlatList
-                            data={cartItems}
+                            data={carts}
                             renderItem={renderItem}
                             keyExtractor={(item, index) => index.toString()}
                         />
-                    </View>
-                </View>
-
-                <View style={styles.form3}>
-                    <View>
-                        {cartItems.map((item, index) => (
-                            <View key={index}>
-                                <Text style={styles.title3}>{item.price}đ</Text>
-                            </View>
-                        ))}
                     </View>
                 </View>
             </View>
@@ -62,10 +77,10 @@ const MyorderCurrent = ({ route, navigation }) => {
                 <Text></Text>
             </View>
         </View>
-    )
+    );
 }
 
-export default MyorderCurrent
+export default MyorderCurrent;
 
 const styles = StyleSheet.create({
     butOrder: {
@@ -103,17 +118,17 @@ const styles = StyleSheet.create({
         lineHeight: 24
     },
     image: {
-        width: 18,
-        height: 18
+        width: 50,
+        height: 50
     },
     form1: {
         flexDirection: 'row',
         marginTop: 20
     },
-    title2: {
+    name: {
         color: '#324A59',
         fontWeight: '500',
-        fontSize: 12,
+        fontSize: 15,
         lineHeight: 15,
         marginLeft: 8
     },
@@ -165,14 +180,22 @@ const styles = StyleSheet.create({
     title: {
         color: '#001833',
         fontWeight: '500',
-        fontSize: 16,
+        fontSize: 20,
         lineHeight: 24,
         marginTop: 20,
-        textAlign: 'center'
+        marginLeft: 150
     },
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        padding: 26
+        padding: 26,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    item: {
+        width: 500,
     }
 })

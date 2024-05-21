@@ -32,7 +32,8 @@
     "react-navigation": "^5.0.0",
     "react-redux": "^9.1.2",
     "start": "^5.1.0",
-    "stripe": "^15.6.0"
+    "stripe": "^15.6.0",
+    "unidecode": "^1.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

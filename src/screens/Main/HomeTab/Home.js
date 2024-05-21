@@ -1,14 +1,15 @@
 import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, TextInput, Keyboard } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { appStyle, windowHeight, windowWidth } from '../../../constants/AppStyle'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLOR, ICON } from '../../../constants/Theme'
 import FastImage from 'react-native-fast-image'
 import axios from 'axios'
+import unidecode from 'unidecode';
 import { useCart } from '../../../context/CartContext';
+import { UserContext } from '../../../context/UserContext';
 
 const Home = ({ navigation, route }) => {
-  const [name, setName] = useState('');
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSearchInput, setShowSearchInput] = useState(false);
@@ -17,16 +18,11 @@ const Home = ({ navigation, route }) => {
   const [isSearching, setIsSearching] = useState(false);
   const cartItems = route.params?.cartItems || [];
   const { cartItemCount } = useCart();
+  const { userData, fetchUserData } = useContext(UserContext);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    const getName = async () => {
-      const storedName = await AsyncStorage.getItem('name');
-      if (storedName) {
-        setName(storedName);
-      }
-    };
-
-    getName();
+    fetchData();
   }, []);
 
   const closeSearchInput = () => {
@@ -60,8 +56,9 @@ const Home = ({ navigation, route }) => {
       } else {
         const response = await axios.get(`http://10.0.2.2:3000/apiProduct/detailProduct?name=${searchValue}`);
         const allProducts = response.data; // Danh sách tất cả sản phẩm từ API
+        const searchValueUnaccented = unidecode(searchValue.toLowerCase());
         const filteredProducts = allProducts.filter(product =>
-          product.name.toLowerCase().includes(searchValue.toLowerCase())
+          unidecode(product.name.toLowerCase()).includes(searchValueUnaccented)
         );
         setSearchResults(filteredProducts);
         setIsSearching(true);
@@ -73,19 +70,17 @@ const Home = ({ navigation, route }) => {
     closeSearchInput();
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('http://10.0.2.2:3000/apiProduct/listProduct');
-        setData(response.data);
-        console.log(data)
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('http://10.0.2.2:3000/apiProduct/listProduct');
+      setData(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false); // Đặt isLoading thành false sau khi nhận dữ liệu hoặc gặp lỗi
+    }
+  };
 
   // useEffect(() => {
   //   const unsubscribe = navigation.addListener('focus', () => {
@@ -94,6 +89,11 @@ const Home = ({ navigation, route }) => {
 
   //   return unsubscribe;
   // }, [navigation, route, cartItems]);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true); // Đặt isRefreshing thành true khi người dùng kéo màn hình để làm mới
+    fetchData();
+  };
 
   const handleMyCart = () => {
     navigation.navigate('MyCart', { cartItems: cartItems });
@@ -113,7 +113,9 @@ const Home = ({ navigation, route }) => {
     <SafeAreaView style={[appStyle.container, { padding: 0 }]}>
       <View style={{ padding: 15, flexDirection: 'row', justifyContent: 'space-between', height: windowHeight * 0.08, alignItems: 'center' }}>
         <View>
-          <Text style={[appStyle.text20Bold, { color: COLOR.primary }]}>{name ? `Welcome, ${name}!` : 'Welcome!'}</Text>
+          {userData && userData.user && (
+            <Text style={[appStyle.text20, { color: COLOR.primary }]}>Welcome, {userData.user.name}</Text>
+          )}
         </View>
         <TouchableOpacity onPress={() => handleMyCart()}>
           <FastImage source={ICON.Cart} style={appStyle.iconBig} resizeMode='stretch' />
@@ -155,9 +157,9 @@ const Home = ({ navigation, route }) => {
           <FastImage source={ICON.Find} style={appStyle.iconBig} resizeMode='stretch' />
         </TouchableOpacity>
       </View>
-      <View style={{ backgroundColor: COLOR.primary, width: '100%', height: '85%', borderRadius: 25, marginTop: 20 }}>
+      <View style={{ backgroundColor: COLOR.primary, width: '100%', height: '80%', borderRadius: 25, marginTop: 20 }}>
         <Text style={[appStyle.text20, { color: COLOR.grayText, margin: 15 }]}>Select your coffee</Text>
-        {isLoading ? (
+        {isLoading && !isRefreshing ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
           isSearching ? (
@@ -169,6 +171,8 @@ const Home = ({ navigation, route }) => {
                 data={searchResults}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={renderItem}
+                refreshing={isRefreshing}
+                onRefresh={handleRefresh}
               />
             ) : (
               <Text style={{ margin: 20, textAlign: 'center', color: 'red' }}>Không có sản phẩm bạn cần tìm</Text>
@@ -181,6 +185,8 @@ const Home = ({ navigation, route }) => {
               data={data}
               keyExtractor={(item, index) => index.toString()}
               renderItem={renderItem}
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
             />
           )
         )}

@@ -1,83 +1,80 @@
-import React, { useState } from 'react';
-import { View, Button, StyleSheet, Text } from 'react-native';
-import { CardField, useConfirmPayment } from '@stripe/stripe-react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Button, StyleSheet, Text, Alert } from 'react-native';
+import { CardField, useStripe } from '@stripe/stripe-react-native';
+import { loadStripe } from '@stripe/stripe-js';
 import { useNavigation, useRoute } from '@react-navigation/native'
 
+async function initializeStripe() {
+  const stripe = await loadStripe('pk_test_51PA9vlRsfm3Ucs22ixDUZ8mt2Ki9E7WR4tSil67ONZD4dptsAwjVZ0J2IFNEEf0iHQhDNEaTT87f6mTD9dnY1lAW00TQcuO9MO');
+  return stripe;
+}
+
 function PaymentScreen() {
-  const fetchPaymentIntentClientSecret = async () => {
-    const response = await fetch('http://10.0.2.2:3000/create-payment-intent', {
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const [loading, setLoading] = useState(false);
+
+  const fetchPaymentSheetParams = async () => {
+    const response = await fetch(`http://10.0.2.2:3000/create-payment-intent`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
     });
-    const { clientSecret } = await response.json();
-    return clientSecret;
+    const { paymentIntent, ephemeralKey, customer } = await response.json();
+
+    return {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+    };
   };
 
-  const { confirmPayment, loading } = useConfirmPayment();
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const navigation = useNavigation();
-  
+  const initializePaymentSheet = async () => {
+    const {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+      publishableKey,
+    } = await fetchPaymentSheetParams();
 
-  const handlePayPress = async () => {
-    const billingDetails = {
-      email: 'jenny.rosen@example.com',
-    };
-
-    // Fetch the intent client secret from the backend
-    const clientSecret = await fetchPaymentIntentClientSecret();
-
-    // Confirm the payment with the card details
-    const { paymentIntent, error } = await confirmPayment(clientSecret, {
-      paymentMethodType: 'Card',
-      paymentMethodData: {
-        billingDetails,
-      },
+    const { error } = await initPaymentSheet({
+      merchantDisplayName: "Example, Inc.",
+      customerId: customer,
+      customerEphemeralKeySecret: ephemeralKey,
+      paymentIntentClientSecret: paymentIntent,
+      allowsDelayedPaymentMethods: true,
+      defaultBillingDetails: {
+        name: 'Jane Doe',
+      }
     });
+    if (!error) {
+      setLoading(true);
+    }
+  };
+  const openPaymentSheet = async () => {
+    const { error } = await presentPaymentSheet();
 
     if (error) {
-      console.log('Payment confirmation error', error);
-    } else if (paymentIntent) {
-      console.log('Success from promise', paymentIntent);
-      setPaymentSuccess(true);
-      setTimeout(() => {
-        navigation.navigate('Home');
-      }, 2000);
+      Alert.alert(`Error code: ${error.code}`, error.message);
+    } else {
+      Alert.alert('Success', 'Your order is confirmed!');
     }
   };
 
+  useEffect(() => {
+    initializeStripe().then(() => {
+      initializePaymentSheet();
+    });
+  }, []);
+
   return (
     <View style={styles.container}>
-      {paymentSuccess ? (
-        <Text>Bạn đã thanh toán thành công!</Text>
-      ) : (
-        <>
-          <CardField
-            postalCodeEnabled={true}
-            placeholders={{
-              number: '4242 4242 4242 4242',
-            }}
-            cardStyle={{
-              backgroundColor: '#FFFFFF',
-              textColor: '#000000',
-            }}
-            style={styles.cardField}
-            onCardChange={cardDetails => {
-              console.log('cardDetails', cardDetails);
-            }}
-            onFocus={focusedField => {
-              console.log('focusField', focusedField);
-            }}
-          />
-          <Button
-            onPress={handlePayPress}
-            title="Pay"
-            disabled={loading}
-            buttonStyle={styles.button}
-          />
-        </>
-      )}
+      <Button
+        variant="primary"
+        disabled={!loading}
+        title="Checkout"
+        onPress={openPaymentSheet}
+      />
     </View>
   );
 }

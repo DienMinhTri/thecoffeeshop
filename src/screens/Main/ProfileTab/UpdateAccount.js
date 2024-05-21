@@ -1,31 +1,48 @@
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native'
+import React, { useState, useContext } from 'react'
 import { appStyle, windowHeight, windowWidth } from '../../../constants/AppStyle'
 import FastImage from 'react-native-fast-image'
 import { COLOR, ICON } from '../../../constants/Theme'
 import { useNavigation } from '@react-navigation/native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserContext } from '../../../context/UserContext'
 
 const UpdateAccount = () => {
 
     const navigation = useNavigation();
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [address, setAddress] = useState('');
+    const [newUserData, setNewUserData] = useState({});
+    const { userData, fetchUserData } = useContext(UserContext);
 
+    const handleInputChange = (key, value) => {
+        setNewUserData({ ...newUserData, [key]: value });
+    };
 
     const handleSave = async () => {
         try {
-            await AsyncStorage.setItem('name', name);
-            await AsyncStorage.setItem('phoneNumber', phoneNumber);
-            await AsyncStorage.setItem('email', email);
-            await AsyncStorage.setItem('address', address);
-            navigation.navigate('Account');
+            // Kiểm tra xem newUserData có chứa các trường phone và address hay không
+            const updatedUserData = {
+                ...newUserData,
+            };
+
+            // Gọi API để cập nhật thông tin người dùng với các giá trị mới từ updatedUserData
+            const response = await fetch('http://10.0.2.2:3000/api/updateProfile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedUserData)
+            });
+            if (!response.ok) {
+                throw new Error('Failed to update user data');
+            }
+            Alert.alert('Thông báo', 'Cập nhật thông tin người dùng thành công');
+            fetchUserData();
+            navigation.navigate('Account')
         } catch (error) {
-            console.log('Error saving data: ', error);
+            console.error(error);
+            Alert.alert('Lỗi', 'Đã xảy ra lỗi khi cập nhật thông tin người dùng');
         }
-    }
+    };
+    
     return (
         <SafeAreaView style={appStyle.container}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -47,9 +64,9 @@ const UpdateAccount = () => {
                     <Text style={[appStyle.text14, { color: COLOR.grayText }]}>Tên</Text>
                     <TextInput
                         style={[appStyle.text18, { width: windowWidth * 0.7 }]}
-                        placeholder='Nhập tên'
-                        value={name}
-                        onChangeText={(text) => setName(text)}
+                        placeholder={userData.user.name}
+                        value={newUserData.name || userData?.name}
+                        onChangeText={value => handleInputChange('name', value)}
                     />
                 </View>
             </View>
@@ -63,9 +80,9 @@ const UpdateAccount = () => {
                     <Text style={[appStyle.text14, { color: COLOR.grayText }]}>Số điện thoại</Text>
                     <TextInput
                         style={[appStyle.text18, { width: windowWidth * 0.7 }]}
-                        placeholder='Nhập số điện thoại'
-                        value={phoneNumber}
-                        onChangeText={(text) => setPhoneNumber(text)}
+                        placeholder={userData.user.phone.toString()}
+                        value={newUserData.phone || userData?.phone}
+                        onChangeText={value => handleInputChange('phone', value)}
                     />
                 </View>
             </View>
@@ -80,9 +97,9 @@ const UpdateAccount = () => {
                     <Text style={[appStyle.text14, { color: COLOR.grayText }]}>Email</Text>
                     <TextInput
                         style={[appStyle.text18, { width: windowWidth * 0.7 }]}
-                        placeholder='Nhập email'
-                        value={email}
-                        onChangeText={(text) => setEmail(text)}
+                        placeholder={userData.user.email.toString()}
+                        editable={false}
+                        selectTextOnFocus={false}
                     />
                 </View>
             </View>
@@ -97,9 +114,9 @@ const UpdateAccount = () => {
                     <Text style={[appStyle.text14, { color: COLOR.grayText }]}>Địa chỉ</Text>
                     <TextInput
                         style={[appStyle.text18, { width: windowWidth * 0.7 }]}
-                        placeholder='Nhập địa chỉ'
-                        value={address}
-                        onChangeText={(text) => setAddress(text)}
+                        placeholder={userData?.user?.address ? userData.user.address.toString() : 'Nhập vào địa chỉ'}
+                        value={newUserData.address || userData?.address}
+                        onChangeText={value => handleInputChange('address', value)}
                     />
                 </View>
             </View>
